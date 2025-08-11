@@ -1,0 +1,120 @@
+# Volume 5 – CNC & Digital Fabrication Master Guide
+
+This volume covers CNC routing, milling, plasma cutting, and laser engraving as part of the maker toolkit. It includes machine setup, tooling selection, CAM workflows, feeds/speeds, and safety.
+
+---
+
+## 1. CNC Basics
+
+### 1.1 Machine Types
+- **CNC Router** – Ideal for wood, plastics, light aluminum.
+- **CNC Mill** – Precision machining, metals, smaller work area.
+- **Plasma Cutter** – Fast cutting of conductive metals.
+- **Laser Cutter/Engraver** – High precision, for wood, acrylic, engraving metals (with coatings).
+
+### 1.2 Key Components
+- Spindle/laser head/plasma torch.
+- Stepper or servo motors with motion control.
+- Controller board (GRBL, Mach3, LinuxCNC).
+- Workholding (clamps, vacuum tables, vises).
+
+---
+
+## 2. CAM Workflows
+
+### 2.1 Fusion 360 CAM
+1. Model the part.
+2. Switch to Manufacture workspace.
+3. Set stock size and origin.
+4. Select operation type (2D contour, pocket, adaptive clearing).
+5. Generate toolpaths, simulate, post-process.
+
+### 2.2 LightBurn (Laser)
+- Import vector art (SVG, DXF) or raster images.
+- Assign layers with speed/power settings.
+- Frame work area before cutting.
+
+### 2.3 SheetCAM (Plasma)
+- Import DXF.
+- Define tool parameters (kerf width, pierce delay).
+- Nest parts for material efficiency.
+
+---
+
+## 3. Tooling & Feeds/Speeds
+
+### 3.1 Tool Types
+- **End mills**: Flat, ball nose, V-bit.
+- **Laser lenses**: Focus distance determines kerf width.
+- **Plasma tips**: Sized for amperage.
+
+### 3.2 Feeds & Speeds Formula
+`Feed rate = RPM × Chip Load × Number of Flutes`
+
+### 3.3 Starter Reference Table (Router, 1/8" end mill)
+| Material | RPM | Feed Rate | Depth per Pass |
+|----------|-----|-----------|----------------|
+| Plywood  | 18k | 900 mm/min | 2–3 mm |
+| Acrylic  | 16k | 600 mm/min | 1–2 mm |
+| Aluminum | 12k | 300 mm/min | 0.5–1 mm |
+
+---
+
+## 4. Workholding & Fixturing
+- **Clamps**: Simple, strong, can interfere with toolpath.
+- **Vacuum table**: Great for flat sheet material.
+- **Double-sided tape**: Good for small/light parts.
+- **Vise**: Best for rigid holding in milling.
+
+---
+
+## 5. Material Strategies
+
+### 5.1 Wood
+- Upcut bits for clean bottom edge, downcut for clean top edge.
+- Avoid burning: keep feed rate high enough.
+
+### 5.2 Aluminum
+- Use single-flute bits for chip clearance.
+- Apply lubricant (WD-40, cutting fluid).
+
+### 5.3 Acrylic
+- Use O-flute bits.
+- Avoid melting: high feed, moderate RPM, shallow passes.
+
+### 5.4 Steel (Plasma)
+- Proper pierce height is critical.
+- Adjust amperage for thickness.
+
+---
+
+## 6. G-code for CNC vs 3D Printing
+- CNC uses absolute positioning with multiple tool changes.
+- 3D printing G-code includes extrusion commands (E axis); CNC omits.
+- Common commands: `G0` (rapid), `G1` (linear cut), `M3` (spindle on), `M5` (spindle off).
+
+---
+
+## 7. Maintenance & Calibration
+- Check tram (spindle perpendicularity) monthly.
+- Clean and lubricate lead screws/rails.
+- Inspect belts or ball screws for wear.
+
+---
+
+## 8. Safety Essentials
+- Always wear eye and ear protection.
+- Secure loose clothing and hair.
+- Stay clear of moving gantry and spindle.
+- Never leave machine unattended.
+
+---
+
+## 9. Example Projects
+1. CNC router: Custom plywood laptop stand.
+2. Laser cutter: Acrylic LED sign with engraved logo.
+3. Plasma: Steel garden art panel.
+
+---
+
+*End of Volume 5.*
