@@ -1,0 +1,144 @@
+# Volume 3 – 3D Printing Masterclass
+
+This volume provides a deep dive into 3D printing with a focus on **Ender 3**, **Cura**, advanced slicer strategies, filament-specific profiles, troubleshooting, calibration, and STL preparation workflows.
+
+---
+
+## 1. Hardware Overview
+
+### 1.1 Ender 3 Variants
+- **Ender 3 (Original)** – Budget-friendly, requires manual bed leveling, stock hotend PTFE-lined.
+- **Ender 3 V2** – Glass bed, quieter stepper drivers, better screen.
+- **Ender 3 S1/S1 Pro** – Direct drive extruder, auto bed leveling (CR Touch), dual Z-axis.
+
+### 1.2 Common Upgrades
+- **All-metal hotend** – Allows higher temp filaments (PETG, Nylon, PC).
+- **Dual Z-axis kit** – Improves gantry stability.
+- **BLTouch/CR Touch** – Automatic mesh bed leveling.
+- **OctoPrint** – Remote monitoring & control.
+- **Enclosure** – Essential for ABS, ASA, Nylon.
+
+---
+
+## 2. Slicer Mastery
+
+### 2.1 Cura Advanced Settings
+- **Flow rate**: Fine-tune extrusion; start at 100%, adjust in 1% increments.
+- **Coasting**: Reduce oozing by stopping extrusion slightly before travel.
+- **Ironing**: Smooth top surfaces by slow extra passes.
+- **Z-hop**: Prevent nozzle collisions when traveling.
+
+### 2.2 Support Strategies
+- **Tree supports**: Flexible, save material, easy removal; best for organic shapes.
+- **Block supports**: Stronger, better for mechanical parts.
+
+### 2.3 PrusaSlicer Equivalents
+- **Flow rate** = Extrusion multiplier.
+- **Coasting** = Wipe while retracting.
+- **Ironing** = Enable ironing in top solid infill.
+
+---
+
+## 3. Filament Profiles
+
+| Material | Nozzle Temp | Bed Temp | Cooling | Notes |
+|----------|-------------|----------|---------|-------|
+| PLA      | 190–210°C   | 60°C     | 100%    | Easy to print |
+| PLA+     | 205–215°C   | 60°C     | 100%    | Slightly tougher than PLA |
+| PETG     | 235–250°C   | 70–80°C  | 30–50%  | Reduce retraction; sticks aggressively |
+| ABS      | 230–250°C   | 100°C    | 0%      | Needs enclosure to avoid warping |
+| TPU      | 215–230°C   | 40–60°C  | 50–100% | Print slow (~20–30 mm/s) |
+| Nylon    | 240–260°C   | 70–90°C  | 0–30%   | Dry thoroughly before printing |
+
+**Tip:** Always dry hygroscopic filaments (PETG, Nylon, TPU) at recommended temps before printing.
+
+---
+
+## 4. Printer Calibration
+
+### 4.1 E-steps/mm
+1. Mark filament 120 mm above extruder.
+2. Command 100 mm extrusion.
+3. Measure remaining filament – adjust `M92 E<new_value>`.
+
+### 4.2 Flow Rate Tuning
+- Print a single-wall cube.
+- Measure wall thickness; adjust flow % to match model wall thickness.
+
+### 4.3 Linear Advance (K-factor)
+- Reduces corner blobbing by adjusting extrusion during speed changes.
+- Enable in firmware; tune using test patterns.
+
+### 4.4 Bed Tramming & Mesh Leveling
+- Manual: Adjust corner screws until paper drags slightly under nozzle.
+- Mesh: Use BLTouch/CR Touch to probe multiple points.
+
+---
+
+## 5. Troubleshooting Guide
+
+**Symptom → Cause → Fix Table:**
+
+| Symptom | Possible Cause | Fix |
+|---------|----------------|-----|
+| Stringing | Too high temp; excessive retraction distance | Lower temp, reduce retraction |
+| Layer shifting | Loose belts, pulley grub screws, stepper driver overheating | Tighten belts, check pulleys, add cooling |
+| Warping | Bed too cold; no enclosure; drafts | Increase bed temp, use brim, add enclosure |
+| Z-banding | Inconsistent Z movement | Check leadscrew straightness, lubricate |
+| Under-extrusion | Clogged nozzle, low flow rate, filament slip | Clean nozzle, increase flow, check extruder tension |
+
+---
+
+## 6. Advanced Techniques
+
+### 6.1 Custom G-code Scripts
+**Example Start G-code:**
+```
+G28 ; Home all axes
+G92 E0 ; Reset extruder
+G1 Z2.0 F3000 ; Move Z up
+G1 X0 Y0 F1500 ; Move to corner
+M140 S{material_bed_temperature_layer_0} ; Set bed temp
+M104 S{material_print_temperature_layer_0} ; Set nozzle temp
+```
+
+### 6.2 Multi-Material Printing
+- Manual filament swaps via M600 command (requires firmware support).
+- Palette/MMU for automatic swaps.
+
+### 6.3 Flexible Filament Printing
+- Use direct drive extruder if possible.
+- Disable retraction or keep minimal.
+- Slow print speed dramatically.
+
+---
+
+## 7. STL Preparation
+
+### 7.1 Repair Tools
+- **Meshmixer** – Inspect, fix holes, reduce triangles.
+- **Netfabb** – Automatic repairs.
+- **Blender** – Mesh editing, scaling.
+
+### 7.2 Reducing File Size
+- Use decimation to reduce triangle count while preserving shape.
+
+---
+
+## 8. Example Projects
+
+1. **Parametric box with snap-fit lid** – Designed in Fusion 360, tuned tolerances, prints without supports.
+2. **Printable camera mount** – Uses PETG for strength, includes articulating joints.
+
+---
+
+## 9. Quick Reference
+
+- PLA prints cool & fast; PETG prints hot & slow.
+- Always tune first layer height for adhesion.
+- Keep spare nozzles and PTFE tubing.
+- Maintain: Lubricate Z-rod, clean bed, check belts.
+
+---
+
+*End of Volume 3.*
