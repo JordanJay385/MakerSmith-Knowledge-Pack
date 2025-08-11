@@ -1,0 +1,109 @@
+# Volume 4 – CAD & STL Creation
+
+This volume covers the process of designing, repairing, and preparing STL files for 3D printing. It focuses on practical workflows using **Fusion 360**, **FreeCAD**, **Tinkercad**, and **Blender**, with attention to tolerances, parametric design, and mesh repair.
+
+---
+
+## 1. CAD Platforms Overview
+
+### 1.1 Fusion 360
+- **Strengths:** Professional parametric modeling, assemblies, CAM integration.
+- **Workflow:** Sketch → Extrude/Revolve → Combine/Fillet/Chamfer → Export STL.
+- **Tip:** Name sketches and bodies to keep large projects organized.
+
+### 1.2 FreeCAD
+- **Strengths:** Open-source parametric CAD, customizable workbenches.
+- **Workflow:** Part Design workbench for parametric parts; Mesh Design for STL prep.
+
+### 1.3 Tinkercad
+- **Strengths:** Beginner-friendly, browser-based, quick concept models.
+- **Workflow:** Combine shapes → adjust dimensions → export STL.
+
+### 1.4 Blender
+- **Strengths:** Mesh editing, sculpting, complex organic shapes.
+- **Workflow:** Import mesh → edit geometry → fix normals → export STL.
+
+---
+
+## 2. Design Principles for 3D Printing
+
+- **Parametric design:** Set dimensions as parameters to easily adjust later.
+- **Overhang limits:** Avoid overhangs >45° unless using supports.
+- **Wall thickness:** Minimum 1.2 mm for strength (3 perimeters with 0.4 mm nozzle).
+- **Tolerances:** For press fits, leave 0.1–0.2 mm gap; for sliding fits, 0.3–0.5 mm.
+- **Fillets vs chamfers:** Fillets for stress distribution; chamfers for easy assembly.
+
+---
+
+## 3. Preparing for 3D Printing
+
+### 3.1 STL Export Settings
+- **Binary STL** – smaller file size, widely supported.
+- **ASCII STL** – larger, human-readable, useful for debugging.
+
+**Fusion 360 Export:** Right-click body → Save as STL → High refinement.
+
+### 3.2 Checking for Non-Manifold Edges
+- Non-manifold geometry = holes, flipped normals, disconnected edges.
+- Repair before slicing to avoid unpredictable prints.
+
+### 3.3 Fixing Inverted Normals
+- In Blender: Edit Mode → Select All → Recalculate Normals (Shift+N).
+
+---
+
+## 4. Mesh Optimization
+
+- **Decimation:** Reduce triangle count to make slicing faster without losing detail.
+- **Remeshing:** Create evenly sized triangles for cleaner slicing.
+
+**Tools:**
+- Meshmixer → Edit → Reduce
+- Blender → Decimate modifier
+
+---
+
+## 5. Troubleshooting STL Issues
+
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| Holes in mesh | Export errors or bad boolean ops | Use Meshmixer or Netfabb repair |
+| Self-intersecting faces | Overlapping geometry | Merge or clean up in CAD before export |
+| Scaling wrong | Units mismatch | Confirm units before export; Fusion 360 defaults to mm |
+
+---
+
+## 6. Designing for Electronics Integration
+
+- **PCB mounting holes:** Match manufacturer hole sizes; add 0.2 mm clearance.
+- **Cable channels:** Include 10–20% extra space for sleeving.
+- **Snap-fit features:** Use flexible materials (PLA+ or PETG) and correct clearance.
+
+---
+
+## 7. Example Workflows
+
+### 7.1 Fusion 360 → Cura → Ender 3
+1. Model part with correct tolerances.
+2. Export STL (high refinement).
+3. Import into Cura; set orientation and supports.
+4. Slice and save G-code to SD card.
+
+### 7.2 FreeCAD → PrusaSlicer → Prusa Mini
+1. Design in Part Design workbench.
+2. Export as STL via Mesh Design.
+3. Slice in PrusaSlicer; check preview.
+4. Print via USB or SD.
+
+---
+
+## 8. Quick Reference
+
+- Always check model scale before slicing.
+- Use parametric design for adjustable parts.
+- Avoid overly complex meshes; keep STL file size reasonable.
+- Test-print critical parts at reduced height to check fit.
+
+---
+
+*End of Volume 4.*
