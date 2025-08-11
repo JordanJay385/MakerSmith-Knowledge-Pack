@@ -1,0 +1,179 @@
+# Volume 7 – Robotics & Automation Master Guide
+
+This volume covers the design, construction, and programming of robots and automated systems, integrating mechanical, electrical, and software disciplines.
+
+---
+
+## 1. Introduction to Robotics
+
+Robotics combines mechanical design, electronics, and programming to build systems capable of performing tasks autonomously or via remote control.
+
+**Core Components:**
+- Structure/frame
+- Actuators (motors, servos)
+- Sensors
+- Controller (microcontroller/SBC)
+- Power system
+- Software
+
+---
+
+## 2. Robot Types in Maker Culture
+
+### 2.1 Wheeled Robots
+- **2WD Differential Drive** – Simple, agile.
+- **4WD Platforms** – Better traction, stability.
+- **Mecanum/Omni Wheel Robots** – Move in any direction without turning.
+
+### 2.2 Legged Robots
+- **Bipeds** – Two legs, human-like walking.
+- **Quadrupeds** – Four legs, stable movement.
+- **Hexapods** – Six legs, extreme stability.
+
+### 2.3 Robotic Arms & Manipulators
+- Fixed or mobile base.
+- Multiple degrees of freedom (DOF).
+- End effectors: grippers, tools.
+
+### 2.4 Mobile Platforms
+- Autonomous rovers, delivery bots.
+- Underwater ROVs.
+
+---
+
+## 3. Core Mechanical Design
+
+### 3.1 Chassis
+- Materials: aluminum, acrylic, 3D printed parts.
+- Balance weight to prevent tipping.
+
+### 3.2 Transmission
+- Gear trains, belts, chains.
+- Direct drive for simplicity.
+
+### 3.3 Joints
+- Rotary joints for arms.
+- Linear slides for automation.
+
+---
+
+## 4. Actuators
+
+### 4.1 DC Motors
+- High speed, require motor drivers (L298N, TB6612FNG).
+- Encoders for precise control.
+
+### 4.2 Stepper Motors
+- Controlled in discrete steps; ideal for precision tasks.
+
+### 4.3 Servo Motors
+- Standard: Position control over ~180°.
+- Continuous: Act as gearmotors.
+
+### 4.4 Linear Actuators
+- Convert rotary motion to linear.
+
+---
+
+## 5. Sensors in Robotics
+
+### 5.1 Distance Sensing
+- Ultrasonic (HC-SR04), IR sensors.
+- LiDAR for mapping.
+
+### 5.2 Orientation
+- IMU (MPU6050) for tilt, yaw, roll.
+
+### 5.3 Position Feedback
+- Rotary encoders.
+- Potentiometers.
+
+### 5.4 Vision Systems
+- Camera modules (Raspberry Pi Camera, USB webcams).
+- Machine vision with OpenCV.
+
+---
+
+## 6. Control Systems
+
+### 6.1 Microcontrollers
+- Arduino Uno, Mega for basic robots.
+- ESP32 for wireless control.
+
+### 6.2 Single Board Computers
+- Raspberry Pi for high-level tasks.
+- NVIDIA Jetson Nano for AI/vision.
+
+### 6.3 Motor Drivers & ESCs
+- H-bridge for DC motors.
+- Stepper drivers (A4988, TMC2209).
+
+### 6.4 PID Control Basics
+- Proportional, Integral, Derivative control for stability.
+
+---
+
+## 7. Power Systems
+
+- **Battery Types:** LiPo, Li-ion, SLA.
+- **Voltage Regulation:** Step-up/down converters.
+- **Power Distribution:** Ensure separate supplies for logic and motors.
+
+---
+
+## 8. Software & Programming
+
+### 8.1 Arduino/C++
+```cpp
+// Simple motor control
+int motor1 = 5;
+int motor2 = 6;
+void setup() {
+  pinMode(motor1, OUTPUT);
+  pinMode(motor2, OUTPUT);
+}
+void loop() {
+  digitalWrite(motor1, HIGH);
+  digitalWrite(motor2, LOW);
+}
+```
+
+### 8.2 Python
+- Use with Raspberry Pi for high-level logic, vision.
+- Libraries: `gpiozero`, `opencv-python`.
+
+### 8.3 ROS (Robot Operating System)
+- Publish/subscribe framework for sensors, control, and mapping.
+
+---
+
+## 9. Autonomous Navigation
+
+### 9.1 Line Following
+- IR sensors detect track; adjust motor speeds.
+
+### 9.2 Obstacle Avoidance
+- Distance sensors to detect and navigate around obstacles.
+
+### 9.3 SLAM (Simultaneous Localization and Mapping)
+- Use LiDAR or depth cameras to build maps in real-time.
+
+---
+
+## 10. Example Builds
+
+1. **2WD Obstacle Avoiding Robot** – Arduino, ultrasonic sensor, L298N motor driver.
+2. **3D Printed Robotic Arm** – Servos, ESP32, joystick control.
+3. **ROS Rover** – Raspberry Pi, LiDAR, autonomous navigation.
+
+---
+
+## 11. Safety & Best Practices
+
+- Emergency stop button.
+- Overcurrent protection fuses.
+- Secure all wiring and components.
+
+---
+
+*End of Volume 7.*
