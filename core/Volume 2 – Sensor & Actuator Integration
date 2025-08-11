@@ -1,0 +1,136 @@
+# Volume 2 – Sensor & Actuator Integration
+
+This volume covers how to connect, power, and program common sensors and actuators using Arduino and ESP32. It includes wiring guidance, code examples, calibration techniques, and troubleshooting tips.
+
+---
+
+## 1. Sensor Basics
+
+### 1.1 Digital Sensors
+- Output HIGH or LOW (logic 1 or 0).
+- Often require pull-up or pull-down resistors.
+- Examples: PIR motion sensor, limit switches.
+
+### 1.2 Analog Sensors
+- Output a voltage that varies with measurement.
+- Arduino ADC: 10-bit resolution (0–1023); ESP32 ADC1: 12-bit (0–4095).
+- Examples: LDR, potentiometer, analog temperature sensor (TMP36).
+
+---
+
+## 2. Communication Protocols
+
+### 2.1 I²C
+- 2 wires: SDA (data), SCL (clock).
+- Pull-up resistors required (4.7 kΩ typical).
+- Multiple devices share bus via unique addresses.
+
+### 2.2 SPI
+- 4 wires: MOSI, MISO, SCK, CS.
+- Faster than I²C; used for displays, SD cards.
+- One CS pin per device.
+
+### 2.3 UART
+- TX and RX lines for serial communication.
+- Must match baud rate between devices.
+
+---
+
+## 3. Calibration & Filtering
+
+### 3.1 Temperature/Humidity
+- Sensors like DHT22, BME280 may need calibration offsets.
+- Apply rolling average or exponential smoothing to reduce noise.
+
+### 3.2 Motion & Position
+- Accelerometers (MPU6050) require offset calibration for stable readings.
+- Gyroscopes need drift compensation.
+
+---
+
+## 4. Common Sensors
+
+| Sensor | Type | Notes |
+|--------|------|-------|
+| DHT11/DHT22 | Temp/Humidity | DHT22 is more accurate and has wider range |
+| BME280 | Temp/Humidity/Pressure | I²C/SPI; very accurate |
+| HC-SR04 | Ultrasonic Distance | Needs ~20 ms between pings |
+| PIR | Motion | Digital HIGH when motion detected |
+| LDR | Light | Use voltage divider for analog read |
+| MPU6050 | Accelerometer/Gyro | I²C; needs calibration |
+
+---
+
+## 5. Actuators
+
+### 5.1 Servos
+- Controlled via PWM.
+- Powered separately from MCU; common ground required.
+
+### 5.2 DC Motors
+- Use driver (L298N, TB6612FNG) for direction/speed control.
+
+### 5.3 Stepper Motors
+- Use driver (A4988, TMC2209).
+- Requires correct steps/mm setup for mechanical accuracy.
+
+### 5.4 Relays
+- Mechanical or solid-state.
+- Isolate high-voltage side from MCU.
+
+---
+
+## 6. Power Management for Peripherals
+- Always check voltage compatibility (3.3V vs 5V).
+- Use level shifters where needed.
+- Avoid drawing actuator current directly from MCU pins.
+
+---
+
+## 7. Example Projects
+
+### 7.1 Motion-Activated LED Strip (Arduino)
+**Wiring:**
+- PIR sensor OUT → Arduino D2.
+- LED strip controlled via MOSFET on D6.
+
+**Code:**
+```cpp
+int pirPin = 2;
+int ledPin = 6;
+
+void setup() {
+  pinMode(pirPin, INPUT);
+  pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+  if (digitalRead(pirPin) == HIGH) {
+    digitalWrite(ledPin, HIGH);
+  } else {
+    digitalWrite(ledPin, LOW);
+  }
+}
+```
+
+### 7.2 Temperature-Controlled Fan (ESP32 + DHT22)
+- Read temp from DHT22; turn on relay at threshold.
+- Publish readings to MQTT.
+
+### 7.3 Distance Alarm (HC-SR04 + Buzzer)
+- Sound buzzer when distance < 20 cm.
+
+---
+
+## 8. Troubleshooting
+
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| No I²C device found | Wrong SDA/SCL pins; no pull-ups | Check wiring, add pull-ups |
+| Noisy readings | Long wires, interference | Shielded cables, filtering |
+| Servo jitter | Power instability | Separate power, add capacitors |
+| Relay chatter | Floating inputs | Use pull-up/down resistors |
+
+---
+
+*End of Volume 2.*
