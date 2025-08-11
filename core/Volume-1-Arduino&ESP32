@@ -1,0 +1,185 @@
+# Volume 1 – Arduino & ESP32 Deep Reference
+
+This volume is intended to be practical, detailed, and ready to use in real builds. It includes **board quirks**, **power rules**, **communication gotchas**, **networking patterns**, **OTA**, and **battle-tested code templates**.
+
+---
+
+## 1. Board Overviews
+
+### 1.1 Arduino (UNO/Nano/Mega/Leonardo)
+- **MCU:** ATmega328P (UNO/Nano), ATmega2560 (Mega), ATmega32u4 (Leonardo).
+- **Logic voltage:** 5 V (most), analog reference 5 V (can use AREF).
+- **Clock:** 16 MHz.
+- **Strengths:** Simple I/O, abundant libraries, stable for beginners.
+- **Gotchas:** 5 V logic can damage 3.3 V sensors without level shifting.
+
+### 1.2 ESP32 Family (WROOM, S2, S3, C3)
+- **MCU:** Dual-core (Xtensa) on classic ESP32; single-core RISC-V on C3.
+- **Logic:** 3.3 V only. **Do NOT** drive 5 V inputs directly without shifting.
+- **Wi-Fi/BLE:** 2.4 GHz Wi-Fi; BLE supported on most variants (Classic vs BLE depends on chip).
+- **GPIOs:** Not all pins are equal:
+  - **Unsafe/Reserved:** GPIO 6–11 (connected to SPI flash) – avoid.
+  - **Input-only:** GPIOs 34–39 – no output, no pull-ups.
+  - **Boot strapping pins:** 0, 2, 5, 12, 15, etc. – levels at boot affect startup mode.
+- **ADC caveats:** ADC2 unavailable while Wi-Fi is active (use ADC1 for analog when Wi-Fi on).
+
+**Pinout heuristic:** prefer GPIO 4, 5, 12–15, 18, 19, 21–23, 25–27, 32–33 for general I/O.  
+
+---
+
+## 2. Power & Electrical Rules
+
+- **ESP32 input voltage:** 5 V to the 5V pin (board-regulated) or 3.3 V to the 3V3 pin. USB provides 5 V.
+- **Current budget:** Wi-Fi peaks ~300 mA; size regulators/batteries accordingly.
+- **Level shifting:**
+  - 5 V Arduino → 3.3 V device: use a **bidirectional logic level shifter** for I²C; simple divider for one-way signal (e.g., sensor output).
+  - 3.3 V ESP32 → 5 V peripheral: many 5 V devices read 3.3 V as HIGH, but don’t assume—use a level shifter for reliability.
+- **Servo/Motor power:** **Never** power motors/servos from the microcontroller 5 V pin. Use a separate supply, common ground.
+- **Batteries:** LiPo with protection/charger (TP4056). Add a fuse (polyfuse) for safety.
+
+**Low power on ESP32:** Use deep sleep to cut consumption to ~10s of µA; wake via timer, touch, or ext0/ext1 pins.
+
+---
+
+## 3. Programming Environments
+
+### 3.1 Arduino IDE
+- Use **Boards Manager** to install ESP32 platform.
+- Manage libraries via **Library Manager**; prefer official libs or Adafruit/SparkFun.
+
+### 3.2 PlatformIO (recommended for larger projects)
+- `platformio.ini` controls environments/boards/dependencies.
+- Advantages: per-project libs, reproducible builds, OTA targets, unit tests.
+
+### 3.3 MicroPython
+- Flash MicroPython firmware (esptool/Thonny).
+- Use REPL for rapid testing; upload scripts as `boot.py`/`main.py`.
+
+---
+
+## 4. Communication Protocols & Gotchas
+
+### 4.1 I²C (Two-wire, open-drain)
+- Requires **pull-up resistors** (typically 4.7 kΩ) to the bus voltage (3.3 V on ESP32).
+- Multiple devices share SDA/SCL; each device has an address (0x03–0x77).
+- Cable length: keep short; lower speed for longer runs.
+
+**ESP32 default pins (Arduino core):** SDA = 21, SCL = 22 (can be remapped).  
+Use `Wire.begin(SDA, SCL)` to set explicitly.
+
+### 4.2 SPI (Fast, 4-wire + CS)
+- Lines: SCK, MOSI, MISO, plus CS per device.
+- Watch **mode** (CPOL/CPHA). Many sensors default to Mode 0.
+
+### 4.3 UART (Serial)
+- Baud must match; ESP32 has multiple UARTs. Use `HardwareSerial` for secondary ports.
+- Debug over USB serial; separate hardware UART for peripherals when possible.
+
+---
+
+## 5. Networking & IoT Patterns
+
+### 5.1 Wi-Fi Connect (ESP32, Arduino core)
+```cpp
+#include <WiFi.h>
+void wifiConnect(const char* ssid, const char* pass) {
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, pass);
+  unsigned long t0 = millis();
+  while (WiFi.status() != WL_CONNECTED && millis() - t0 < 15000) delay(200);
+}
+```
+
+### 5.2 MQTT (PubSubClient) – Robust Loop
+```cpp
+#include <WiFi.h>
+#include <PubSubClient.h>
+
+WiFiClient espClient;
+PubSubClient mqtt(espClient);
+
+void mqttReconnect() {
+  while (!mqtt.connected()) {
+    if (mqtt.connect("esp32-client", "status/esp32", 0, true, "offline")) {
+      mqtt.publish("status/esp32", "online", true);
+      mqtt.subscribe("cmd/relay");
+    } else delay(1000);
+  }
+}
+
+void setup() {
+  // connect WiFi...
+  mqtt.setServer("broker.hivemq.com", 1883);
+  mqtt.setCallback([](char* topic, byte* payload, unsigned int len){
+    // handle cmds
+  });
+}
+
+void loop() {
+  if (WiFi.status() != WL_CONNECTED) { /* reconnect WiFi */ }
+  if (!mqtt.connected()) mqttReconnect();
+  mqtt.loop();
+}
+```
+
+### 5.3 HTTPS/REST
+- Use `WiFiClientSecure` and set proper root certificates, or temporarily `setInsecure()` for testing.
+
+---
+
+## 6. OTA Firmware Updates (ESP32 Arduino)
+
+```cpp
+#include <WiFi.h>
+#include <ArduinoOTA.h>
+
+void otaSetup(const char* hostname) {
+  ArduinoOTA.setHostname(hostname);
+  ArduinoOTA.onStart([](){ /* stop peripherals */ });
+  ArduinoOTA.onEnd([](){ /* maybe blink */ });
+  ArduinoOTA.onError([](ota_error_t e){ /* log error */ });
+  ArduinoOTA.begin();
+}
+
+void loopOTA() { ArduinoOTA.handle(); }
+```
+
+Usage: call `otaSetup("my-esp32");` in `setup()` after Wi-Fi connects, and call `loopOTA()` in `loop()`.
+
+---
+
+## 7. Patterns & Best Practices
+
+- **Non-blocking code:** Replace `delay()` with `millis()` timers; keep `loop()` short.
+- **Config struct:** Store Wi-Fi/MQTT settings in a struct; persist to NVS/EEPROM.
+- **Watchdog thinking:** Avoid long blocking I/O; use timeouts/retries.
+- **Diagnostics:** Add a status LED/Blink pattern; expose `/status` via MQTT/HTTP.
+
+---
+
+## 8. Integrated Examples
+
+### 8.1 DHT22 + OLED (I²C) + MQTT Publisher (ESP32, Arduino)
+- DHT22 data → GPIO 4 with 10 kΩ pull-up to 3.3 V
+- OLED SSD1306 I²C → SDA 21, SCL 22
+- Shared 3.3 V logic and power; common ground
+
+### 8.2 I²C Scanner (ESP32/Arduino)
+Lists all detected I²C addresses.
+
+### 8.3 MicroPython Wi-Fi + MQTT Minimal
+Connects Wi-Fi and publishes a test payload.
+
+---
+
+## 9. Quick Reference
+
+- **Safe ESP32 pins:** 4, 5, 12–15, 18, 19, 21–23, 25–27, 32–33
+- **ADC note:** Use ADC1 when Wi-Fi is on.
+- **Pull-ups:** I²C needs physical pull-ups; INPUT_PULLUP is not enough for the bus.
+- **Servos:** Isolate power supplies; common ground is mandatory.
+- **MQTT:** Keep connection alive; handle reconnection in `loop()`.
+
+---
+
+*End of Volume 1.*
